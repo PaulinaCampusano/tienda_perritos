@@ -13,7 +13,8 @@ jobs:
 
     steps:
     - name: Checkout código
-      uses: actions/checkout@v3
+      # 1. Actualizado a v4 para eliminar la advertencia de Node.js 20
+      uses: actions/checkout@v4
 
     - name: Configurar credenciales AWS
       uses: aws-actions/configure-aws-credentials@v4
@@ -25,5 +26,13 @@ jobs:
 
     - name: Ejecutar script de AWS CLI
       run: |
+        # 2. Instalar dos2unix para prevenir el error 127 por saltos de línea de Windows
+        sudo apt-get update
+        sudo apt-get install -y dos2unix
+        
+        # 3. Limpiar formato del archivo
+        dos2unix ./scripts/crear-infra.sh
+        
+        # 4. Dar permisos y ejecutar con bash
         chmod +x ./scripts/crear-infra.sh
-        ./scripts/crear-infra.sh
+        bash ./scripts/crear-infra.sh

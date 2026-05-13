@@ -2,8 +2,8 @@ name: CI/CD Tienda Perritos - Frontend
 
 on:
   push:
-    branches: [ "main" ]
-    parent_paths:
+    branches: [ "deploy" ]  # <-- CORRECCIÓN: La rúbrica exige la rama 'deploy'
+    paths:                  # <-- CORRECCIÓN: La sintaxis correcta es 'paths', no 'parent_paths'
       - "frontend/**"
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
             "sudo docker pull ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest",
             "sudo docker stop tienda-frontend || true",
             "sudo docker rm tienda-frontend || true",
-            "sudo docker run -d --name tienda-frontend -p 80:80 ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest"
+            "sudo docker run -d --name tienda-frontend -p 80:8080 ${{ secrets.ECR_REPO_URL_FRONTEND }}:latest" 
           ]}' \
           --output text
-          
+          # EL CAMBIO ARRIBA ES CLAVE: -p 80:8080 (Puerto del host 80 -> Puerto del contenedor 8080)

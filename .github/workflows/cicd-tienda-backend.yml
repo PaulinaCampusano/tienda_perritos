@@ -2,9 +2,9 @@ name: CI/CD Tienda Perritos - Backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "deploy" ]  # Según la pauta, debe ser la rama deploy
     paths:
-      - "backend/**"
+      - "backend/**"        # Solo se ejecuta si hay cambios en la carpeta backend
 
 jobs:
   build-push-deploy-backend:
@@ -22,7 +22,7 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Login en Amazon ECR (runner)
+    - name: Login en Amazon ECR
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build imagen Backend y push a ECR
@@ -35,7 +35,7 @@ jobs:
     - name: Pausa de estabilización SSM
       run: sleep 60
 
-    - name: Desplegar Backend vía SSM
+    - name: Desplegar Backend vía SSM en EC2
       run: |
         aws ssm send-command \
           --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
@@ -48,7 +48,6 @@ jobs:
             "sudo docker pull ${{ secrets.ECR_REPO_URL_BACKEND }}:latest",
             "sudo docker stop tienda-backend || true",
             "sudo docker rm tienda-backend || true",
-            "sudo docker run -d --name tienda-backend -p 3001:3001 ${{ secrets.ECR_REPO_URL_BACKEND }}:latest"
+            "sudo docker run -d --name tienda-backend -p 3001:3001 -e DB_HOST=${{ secrets.DB_HOST_PRIVATE_IP }} -e DB_USER=root -e DB_PASSWORD=admin123 -e DB_NAME=tienda_perritos -e PORT=3001 ${{ secrets.ECR_REPO_URL_BACKEND }}:latest"
           ]}' \
           --output text
-          

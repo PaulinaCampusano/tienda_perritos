@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # --- Servicio Frontend ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:8080"
+    networks:
+      - innova-network
+    depends_on:
+      - backend
+
+  # --- Servicio Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      # Conectamos con el servicio 'database' de más abajo
+      - DB_HOST=database
+      - DB_USER=root
+      - DB_PASSWORD=admin123
+      - DB_NAME=tienda_perritos
+      - DB_PORT=3306
+      - PORT=3001
+    networks:
+      - innova-network
+    depends_on:
+      - database
+
+  # --- Servicio Base de Datos MySQL (Persistencia) ---
+  database:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+      - MYSQL_DATABASE=tienda_perritos
+    ports:
+      - "3306:3306"
+    networks:
+      - innova-network
+    volumes:
+      # Volumen para que no se borren los productos si se apaga el contenedor
+      - db_data:/var/lib/mysql 
+
+# Definición del Volumen Persistente
+volumes:
+  db_data:
+    driver: local
+
+# Red interna
+networks:
+  innova-network:
+    driver: bridge
