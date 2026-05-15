@@ -2,7 +2,7 @@ name: CI/CD Tienda Perritos - Backend
 
 on:
   push:
-    branches: [ "deploy" ]  # Según la pauta, debe ser la rama deploy
+    branches: [ "main" ]
     paths:
       - "backend/**"        # Solo se ejecuta si hay cambios en la carpeta backend
 

@@ -2,7 +2,7 @@ name: CI/CD Tienda Perritos - Frontend
 
 on:
   push:
-    branches: [ "deploy" ]  # <-- CORRECCIÓN: La rúbrica exige la rama 'deploy'
+    branches: [ "main" ]
     paths:                  # <-- CORRECCIÓN: La sintaxis correcta es 'paths', no 'parent_paths'
       - "frontend/**"
 
